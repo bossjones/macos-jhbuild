@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Script that sets up jhbuild, and the jhbuildrc files and moduleset
 # files as symlinks from the git repository.
@@ -6,6 +6,8 @@
 # Copyright 2007, 2008 Imendio AB
 # Copyright 2016 Philip Chimento
 #
+
+set -x
 
 SOURCE=..
 
