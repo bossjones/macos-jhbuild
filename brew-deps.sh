@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export PATH="/Applications/Xcode.app/Contents/Developer/usr/bin:$PATH"
+
 brew install gettext yelp-tools itstool autoconf
 
 export PATH="/usr/local/opt/gettext/bin:$PATH"
