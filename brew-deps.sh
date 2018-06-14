@@ -29,6 +29,9 @@ export LDFLAGS="-L$(brew --prefix icu4c)/lib $LDFLAGS"
 export LDFLAGS="-L$(brew --prefix gettext)/lib $LDFLAGS"
 export CPPFLAGS="-I$(brew --prefix gettext)/include $CPPFLAGS"
 
+# export OPENSSL_INCLUDE_DIR="$(brew --prefix openssl)/include"
+# export OPENSSL_LIB_DIR="$(brew --prefix openssl)/lib"
+
 # make sure it's python 2.7 before running the next step
 
 # MORE: https://github.com/facebook/hhvm/wiki/Building-and-installing-HHVM-on-OSX-10.8-With-Homebrew
