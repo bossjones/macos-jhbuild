@@ -33,10 +33,10 @@ else
 fi
 
 echo "Installing jhbuild configuration..."
-rm -rfv ~/.config
+rm -rfv ~/.config/jhbuildrc
 
 echo "Replacing jhbuild's python symlink..."
-rm -rfv ~/.local/
+rm -rfv ~/.local/bin/{python*,ninja,jhbuild}
 
 rm ~/.jhbuildrc-custom
 
