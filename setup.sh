@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # Script that sets up jhbuild, and the jhbuildrc files and moduleset
 # files as symlinks from the git repository.
@@ -36,10 +36,10 @@ echo "Installing jhbuild..."
 (cd $SOURCE/jhbuild ; ./autogen.sh >/dev/null && make >/dev/null && make install >/dev/null)
 
 echo "Installing jhbuild configuration..."
-mkdir -p $HOME/.config
-ln -sfh `pwd`/jhbuildrc $HOME/.config/jhbuildrc
-if [ ! -f $HOME/.jhbuildrc-custom ]; then
-    cp jhbuildrc-custom-example $HOME/.jhbuildrc-custom
+mkdir -p ~/.config
+ln -sfh `pwd`/jhbuildrc ~/.config/jhbuildrc
+if [ ! -f ~/.jhbuildrc-custom ]; then
+    cp jhbuildrc-custom-example ~/.jhbuildrc-custom
 fi
 
 echo "Setting up extra jhbuild files..."

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # Usage: source init-env.sh
 # do this before trying to build anything with jhbuild

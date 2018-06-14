@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # Script that sets up jhbuild, and the jhbuildrc files and moduleset
 # files as symlinks from the git repository.
