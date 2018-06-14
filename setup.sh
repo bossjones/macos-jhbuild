@@ -37,14 +37,14 @@ echo "Installing jhbuild..."
 
 echo "Installing jhbuild configuration..."
 mkdir -p ~/.config
-ln -sfh `pwd`/jhbuildrc ~/.config/jhbuildrc
+/bin/ln -sfh `pwd`/jhbuildrc ~/.config/jhbuildrc
 if [ ! -f ~/.jhbuildrc-custom ]; then
     cp jhbuildrc-custom-example ~/.jhbuildrc-custom
 fi
 
 echo "Setting up extra jhbuild files..."
 for mod in modulesets/*.modules patches/*.patch; do
-    ln -sfh `pwd`/$mod $SOURCE/jhbuild/$mod
+    /bin/ln -sfh `pwd`/$mod $SOURCE/jhbuild/$mod
 done
 
 echo "Replacing jhbuild's python symlink..."
