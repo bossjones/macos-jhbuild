@@ -29,6 +29,9 @@ export LDFLAGS="-L$(brew --prefix icu4c)/lib $LDFLAGS"
 export LDFLAGS="-L$(brew --prefix gettext)/lib $LDFLAGS"
 export CPPFLAGS="-I$(brew --prefix gettext)/include $CPPFLAGS"
 
+export LDFLAGS="-L$(brew --prefix boost)/lib $LDFLAGS"
+export CPPFLAGS="-I$(brew --prefix boost)/include $CPPFLAGS"
+
 # export OPENSSL_INCLUDE_DIR="$(brew --prefix openssl)/include"
 # export OPENSSL_LIB_DIR="$(brew --prefix openssl)/lib"
 
@@ -59,3 +62,38 @@ export CPPFLAGS="-I$(brew --prefix gettext)/include $CPPFLAGS"
 # LIBMAGICKWAND_LIBRARIES=$(brew --prefix imagemagick)/lib/libMagickWand-6.Q16.dylib \
 # MYSQL_INCLUDE_DIR=$(brew --prefix mysql-connector-c)/include \
 # MYSQL_LIB=$(brew --prefix mysql-connector-c)/lib
+
+
+# cd hhvm
+# cmake . \
+#     -DCMAKE_CXX_COMPILER=$(brew --prefix gcc48)/bin/g++-4.8 \
+#     -DCMAKE_C_COMPILER=$(brew --prefix gcc48)/bin/gcc-4.8 \
+#     -DCMAKE_ASM_COMPILER=$(brew --prefix gcc48)/bin/gcc-4.8 \
+#     -DLIBIBERTY_LIB=$(brew --prefix gcc48)/lib/x86_64/libiberty-4.8.a \
+#     -DCMAKE_INCLUDE_PATH="/usr/local/include:/usr/include" \
+#     -DCMAKE_LIBRARY_PATH="/usr/local/lib:/usr/lib" \
+#     -DLIBEVENT_LIB=$(brew --prefix libeventfb)/lib/libevent.dylib \
+#     -DLIBEVENT_INCLUDE_DIR=$(brew --prefix libeventfb)/include \
+#     -DICU_INCLUDE_DIR=$(brew --prefix icu4c)/include \
+#     -DICU_LIBRARY=$(brew --prefix icu4c)/lib/libicuuc.dylib \
+#     -DICU_I18N_LIBRARY=$(brew --prefix icu4c)/lib/libicui18n.dylib \
+#     -DICU_DATA_LIBRARY=$(brew --prefix icu4c)/lib/libicudata.dylib \
+#     -DREADLINE_INCLUDE_DIR=$(brew --prefix readline)/include \
+#     -DREADLINE_LIBRARY=$(brew --prefix readline)/lib/libreadline.dylib \
+#     -DNCURSES_LIBRARY=$(brew --prefix ncurses)/lib/libncurses.dylib \
+#     -DCURL_INCLUDE_DIR=$(brew --prefix curl)/include \
+#     -DCURL_LIBRARY=$(brew --prefix curl)/lib/libcurl.dylib \
+#     -DBOOST_INCLUDEDIR=$(brew --prefix boostfb)/include \
+#     -DBOOST_LIBRARYDIR=$(brew --prefix boostfb)/lib \
+#     -DBoost_USE_STATIC_LIBS=ON \
+#     -DJEMALLOC_INCLUDE_DIR=$(brew --prefix jemallocfb)/include \
+#     -DJEMALLOC_LIB=$(brew --prefix jemallocfb)/lib/libjemalloc.dylib \
+#     -DLIBINTL_LIBRARIES=$(brew --prefix gettext)/lib/libintl.dylib \
+#     -DLIBINTL_INCLUDE_DIR=$(brew --prefix gettext)/include \
+#     -DLIBDWARF_LIBRARIES=$(brew --prefix libdwarf)/lib/libdwarf.3.dylib \
+#     -DLIBDWARF_INCLUDE_DIRS=$(brew --prefix libdwarf)/include \
+#     -DLIBMAGICKWAND_INCLUDE_DIRS=$(brew --prefix imagemagick)/include/ImageMagick-6 \
+#     -DLIBMAGICKWAND_LIBRARIES=$(brew --prefix imagemagick)/lib/libMagickWand-6.Q16.dylib \
+#     -DMYSQL_INCLUDE_DIR=$(brew --prefix mysql-connector-c)/include \
+#     -DMYSQL_LIB=$(brew --prefix mysql-connector-c)/lib
+# make -j4
