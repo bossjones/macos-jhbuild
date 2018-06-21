@@ -8,6 +8,7 @@
 #
 
 set -x
+set -e
 
 SOURCE=..
 
@@ -33,29 +34,31 @@ else
 fi
 
 echo "Installing jhbuild..."
-(cd $SOURCE/jhbuild ; ./autogen.sh >/dev/null && make >/dev/null && make install >/dev/null)
+cd $SOURCE/jhbuild ; ./autogen.sh >/dev/null && make >/dev/null && make install >/dev/null
 
-echo "Installing jhbuild configuration..."
-mkdir -p ~/.config
-/bin/ln -sfh `pwd`/jhbuildrc.osx ~/.config/jhbuildrc
-if [ ! -f ~/.jhbuildrc-custom ]; then
-    cp jhbuildrc-custom-example ~/.jhbuildrc-custom
-fi
+return 0
 
-echo "Setting up extra jhbuild files..."
-for mod in modulesets/*.modules patches/*.patch; do
-    /bin/ln -sfh `pwd`/$mod $SOURCE/jhbuild/$mod
-done
+# echo "Installing jhbuild configuration..."
+# mkdir -p ~/.config
+# /bin/ln -sfh `pwd`/jhbuildrc.osx ~/.config/jhbuildrc
+# if [ ! -f ~/.jhbuildrc-custom ]; then
+#     cp jhbuildrc-custom-example ~/.jhbuildrc-custom
+# fi
 
-echo "Replacing jhbuild's python symlink..."
-rm ~/.local/bin/python2
-echo '#!/bin/bash' >~/.local/bin/python2
-echo 'exec /usr/bin/python "$@"' >>~/.local/bin/python2
-chmod +x ~/.local/bin/python2
+# echo "Setting up extra jhbuild files..."
+# for mod in modulesets/*.modules patches/*.patch; do
+#     /bin/ln -sfh `pwd`/$mod $SOURCE/jhbuild/$mod
+# done
 
-echo "Installing ninja..."
-curl -LO https://github.com/ninja-build/ninja/releases/download/v1.7.2/ninja-mac.zip && \
-unzip -o ninja-mac.zip ninja -d ~/.local/bin && \
-rm ninja-mac.zip
+# echo "Replacing jhbuild's python symlink..."
+# rm ~/.local/bin/python2
+# echo '#!/bin/bash' >~/.local/bin/python2
+# echo 'exec /usr/bin/python "$@"' >>~/.local/bin/python2
+# chmod +x ~/.local/bin/python2
 
-echo "Done."
+# echo "Installing ninja..."
+# curl -LO https://github.com/ninja-build/ninja/releases/download/v1.7.2/ninja-mac.zip && \
+# unzip -o ninja-mac.zip ninja -d ~/.local/bin && \
+# rm ninja-mac.zip
+
+# echo "Done."
