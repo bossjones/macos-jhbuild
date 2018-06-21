@@ -1,0 +1,393 @@
+<?xml version="1.0"?>
+<!--*- mode: nxml; indent-tabs-mode: nil -*-->
+<!DOCTYPE moduleset SYSTEM "moduleset.dtd">
+<?xml-stylesheet type="text/xsl" href="moduleset.xsl"?>
+<!-- vim:set ts=2 expandtab: -->
+<moduleset>
+    <!-- git repos -->
+    <repository type="git" name="git.gnome.org" default="yes" href="git://git.gnome.org/"/>
+    <repository type="git" name="git.freedesktop.org" href="git://anongit.freedesktop.org/git/"/>
+    <repository type="git" name="github.com" href="git://github.com/"/>
+    <repository type="git" name="wayland" href="git://anongit.freedesktop.org/git/wayland"/>
+    <repository type="git" name="gcc.gnu.org" href="git://gcc.gnu.org/git"/>
+    <repository type="git" name="savannah.gnu.org" href="git://git.savannah.gnu.org"/>
+    <repository type="git" name="git.kernel.org" href="git://git.kernel.org"/>
+    <!-- tarball repos (need to terminate with `/` and must not contain anchors -->
+    <repository type="tarball" name="gnome.org" href="https://download.gnome.org/sources/"/>
+    <!--<repository type="tarball" name="ftp.gnu.org" href="http://ftp.gnu.org/gnu/gcc/"/>-->
+    <!-- add `/gcc/` in order to allow replacement with other mirrors (GNU servers are sometimes down)-->
+    <repository type="tarball" name="gcc" href="ftp://ftp.gwdg.de/pub/misc/gcc/releases/"/>
+    <repository type="tarball" name="ftp.gnu.org" href="http://ftp.gnu.org/gnu/"/>
+    <repository type="tarball" name="qqwing" href="http://ostermiller.org/qqwing/"/>
+    <repository type="tarball" name="tarball.github.com" href="https://github.com/"/>
+    <repository type="tarball" name="downloads.sourceforge.net" href="http://downloads.sourceforge.net/"/>
+    <repository type="tarball" name="freedesktop.org" href="http://freedesktop.org/software/"/>
+    <repository type="git" name="telepathy.freedesktop.org" href="git://anongit.freedesktop.org/telepathy/"/>
+    <repository type="tarball" name="gmplib.org" href="https://gmplib.org/download/gmp/"/>
+    <repository type="tarball" name="sourceforge" href="http://downloads.sourceforge.net/project/"/>
+    <repository type="tarball" name="xmlsoft.org" href="http://xmlsoft.org/sources/"/>
+    <repository type="tarball" name="python.org" href="https://www.python.org/ftp/python/"/>
+    <repository type="tarball" name="launchpad.net-tarball" href="https://launchpad.net/"/>
+    <repository type="tarball" name="pypi.python.org" href="https://pypi.python.org/packages/"/>
+    <repository type="tarball" name="www.midori-browser.org" href="http://www.midori-browser.org/"/>
+    <repository type="tarball" name="www.jikos.cz" href="http://www.jikos.cz/~mikulas/links/download/"/>
+    <repository type="tarball" name="www.lua.org" href="https://www.lua.org/ftp/"/>
+    <!-- bazaar repositories -->
+    <repository type="bzr" name="launchpad.net" href="lp:"/>
+    <!-- NOTE: gnome-suites-core-* and gnome-suites-core-deps-*
+       are supposed to remain self-contained. If apps have dependencies
+       that are not covered there, add them in here
+
+       Please try to keep organized alphabetically by section:
+
+       1) Dependencies
+       2) Normal apps
+       3) Games
+       4) Metamodules
+    -->
+    <!-- Dependencies and miscellaneous -->
+    <autotools id="epiphany">
+        <branch repo="github.com" module="GNOME/epiphany" branch="master" revision="3.21.4"/>
+        <!-- 3.21.4-324-gaf5eaf4 introduces a submodule with path `..` which is not allowed and not a good idea; 3.21.4-323-g754af23 causes `./configure: line 2479: syntax error near unexpected token `git-directory'` -->
+        <dependencies>
+            <!--<dep package="libgd"/>-->
+            <!--git submodules use strange pathes
+which refer to parent directory-->
+        </dependencies>
+    </autotools>
+    <autotools id="500lines">
+        <branch repo="github.com" module="yyuu/pyenv" branch="master"/>
+    </autotools>
+    <!--requires custom command set (see README.md)-->
+    <autotools id="nmap" supports-non-srcdir-builds="no">
+        <branch repo="github.com" module="nmap/nmap" revision="master"/>
+        <dependencies>
+            <dep package="lua-5.3.4"/>
+            <!-- avoid `Makefile:149: recipe for target 'build-lua' failed`; need to be installed from tarball because there's no real source repository -->
+        </dependencies>
+    </autotools>
+    <autotools id="lua-5.3.4" autogen-template="bash -c 'cd %(srcdir)s &amp;&amp; make linux LDFLAGS=&quot;-L%(prefix)s/lib -lncurses&quot; &amp;&amp; make install INSTALL_TOP=%(prefix)s'" skip-install="true">
+        <!-- need to specify LDFLAGS as make variable and not environment; need `-lncurses` in order to avoid `undefined reference to `tputs'`<ref>http://lua-users.org/lists/lua-l/2014-08/msg00307.html</ref> -->
+        <branch repo="www.lua.org" module="lua-5.3.4.tar.gz" version="5.3.4"/>
+        <dependencies>
+            <dep package="readline"/>
+        </dependencies>
+    </autotools>
+    <autotools id="readline">
+        <branch repo="savannah.gnu.org" module="readline" revision="devel"/>
+    </autotools>
+    <cmake id="midori">
+        <branch repo="www.midori-browser.org" module="downloads/midori_0.5.11_all_.tar.bz2" checkoutdir="midori-0.5.11" version="0.5.11"/>
+        <!--<branch repo="launchpad.net" module="midori" revision="trunk"/> fails due to missing python import bzrlib-->
+        <dependencies>
+            <dep package="gcc-4.8"/>
+            <!-- 5.3.0 and 5.2.0 fail due to `x86_64-unknown-linux-gnu/libstdc++-v3/src/c++98/../../../.././libstdc++-v3/src/c++98/istream.cc:358: undefined reference to `std::basic_istream<wchar_t, std::char_traits<wchar_t> >::ignore(long)'`-->
+            <dep package="vala-0.34.0"/>
+            <!--work with tarball instead of git because git repository version fails to build (see below)-->
+            <dep package="libsoup"/>
+            <dep package="gcr"/>
+        </dependencies>
+    </cmake>
+    <autotools id="gedit" autogenargs="--disable-spell">
+        <branch revision="master"/>
+        <dependencies>
+            <dep package="intltool-0.50.2"/>
+            <dep package="gtk-doc"/>
+            <!--<dep package="gspell"/> depends on gettext which fails in autogen.sh due to missing macros -->
+            <dep package="gtk+"/>
+        </dependencies>
+    </autotools>
+    <autotools id="gnome-common">
+        <branch revision="master"/>
+    </autotools>
+    <autotools id="gcr">
+        <branch revision="master"/>
+        <dependencies>
+            <dep package="gnome-common"/>
+            <dep package="glib"/>
+            <dep package="gobject-introspection"/>
+        </dependencies>
+    </autotools>
+    <autotools id="libsoup">
+        <branch revision="master"/>
+    </autotools>
+    <autotools id="vala">
+        <branch revision="master"/>
+        <dependencies>
+            <!--<dep package="vala-0.12.1"/> fails due to `error: Package `gee' not found in specified Vala API directories or GObject-Introspection GIR directories`-->
+            <!--<dep package="vala-0.20.1"/> fails due to `error: Package `gee' not found in specified Vala API directories or GObject-Introspection GIR directories`-->
+            <!--<dep package="vala-0.34.0"/> fails due to `error: Package `gee' not found in specified Vala API directories or GObject-Introspection GIR directories`-->
+            <dep package="libgee-0.18.0"/>
+        </dependencies>
+    </autotools>
+    <autotools id="vala-0.12.1">
+        <branch repo="gnome.org" module="vala/0.12/vala-0.12.1.tar.xz" version="0.12.1"/>
+    </autotools>
+    <autotools id="vala-0.20.1">
+        <branch repo="gnome.org" module="vala/0.20/vala-0.20.1.tar.xz" version="0.20.1"/>
+    </autotools>
+    <autotools id="vala-0.34.0">
+        <branch repo="gnome.org" module="vala/0.34/vala-0.34.0.tar.xz" version="0.34.0"/>
+    </autotools>
+    <autotools id="libgee" autogen-template="bash -c 'cd %(srcdir)s &amp;&amp; ./autogen.sh' &amp;&amp; %(srcdir)s/configure --prefix %(prefix)s %(autogenargs)s">
+        <branch revision="master"/>
+    </autotools>
+    <!--autogen.sh fails due to `gee/Makefile.am:149: error: HAVE_INTROSPECTION does not appear in AM_CONDITIONAL`-->
+    <autotools id="libgee-0.18.0">
+        <branch repo="gnome.org" module="libgee/0.18/libgee-0.18.0.tar.xz" version="0.18.0"/>
+    </autotools>
+    <autotools id="intltool-0.50.2">
+        <branch repo="launchpad.net-tarball" module="intltool/trunk/0.50.2/+download/intltool-0.50.2.tar.gz" version="0.50.2"/>
+    </autotools>
+    <autotools id="intltool">
+        <branch repo="launchpad.net" module="intltool"/>
+        <dependencies>
+            <dep package="bazaar-2.7"/>
+            <!-- for checkout -->
+            <dep package="yelp-tools"/>
+        </dependencies>
+    </autotools>
+    <distutils id="bazaar-2.7">
+        <branch repo="launchpad.net-tarball" module="bzr/2.7/2.7.0/+download/bzr-2.7.0.tar.gz" version="2.7.0" hash="md5:8e5020502efd54f5925a14a456b88b89" size="11586410"/>
+    </distutils>
+    <autotools id="yelp-tools">
+        <branch repo="github.com" module="GNOME/yelp-tools"/>
+        <dependencies>
+            <dep package="itstool"/>
+            <dep package="yelp-xsl"/>
+        </dependencies>
+    </autotools>
+    <autotools id="itstool">
+        <branch repo="github.com" module="itstool/itstool"/>
+        <dependencies>
+            <!--<dep package="lxml"/> fails (see autotools element for details)-->
+            <dep package="libxml2-2.9.4"/>
+        </dependencies>
+    </autotools>
+    <distutils id="lxml">
+        <branch repo="github.com" module="lxml/lxml"/>
+        <!--configure fails due to `RuntimeError: ERROR: Trying to build without Cython, but pre-generated 'src/lxml/lxml.etree.c' is not available (pass \-\-without-cython to ignore this error).`, but passing options to `setup.py` isn't possible (proposed feature at https://bugzilla.gnome.org/show_bug.cgi?id=771996-->
+        <dependencies>
+            <!--<dep package="python-2.7.12"/> deactivated because the installed `python` binary doesn nothing but fail with `ImportError: No module named _io` which is supposed to be fixed by overwriting it with the system `python` binary which doesn't make any sense for this use case-->
+            <dep package="setuptools-27.3.0"/>
+        </dependencies>
+    </distutils>
+    <distutils id="setuptools-27.3.0">
+        <branch repo="pypi.python.org" module="72/e1/741cd8c4825e58119481d8be4254c9cd133db50876b159cdf8cbd253fbb3/setuptools-27.3.0.tar.gz" version="27.3.0" hash="md5:2246eb4c511fa4b50003b10ea2a49d42" size="639967"/>
+    </distutils>
+    <autotools id="yelp-xsl">
+        <branch repo="github.com" module="GNOME/yelp-xsl"/>
+    </autotools>
+    <autotools id="gtk-doc">
+        <branch revision="master"/>
+    </autotools>
+    <autotools id="gspell">
+        <branch repo="github.com" module="GNOME/gspell" revision="master"/>
+        <dependencies>
+            <dep package="gettext-0.19.8.1"/>
+            <!-- requires at least `gettext` 0.19.4 -->
+        </dependencies>
+    </autotools>
+    <autotools id="gcc-git" autogenargs="--disable-multilib --enable-languages='c,c++' --disable-lto --enable-bootstrap" autogen-template="bash -c 'cd %(srcdir)s &amp;&amp; contrib/download_prerequisites' &amp;&amp; bash -c 'cd %(srcdir)s &amp;&amp; autoreconf -i -v -f' &amp;&amp; %(srcdir)s/configure --prefix %(prefix)s %(autogenargs)s">
+        <branch module="gcc" revision="gcc-6_2_0-release" repo="gcc.gnu.org"></branch>
+        <dependencies>
+            <dep package="autoconf-2.64"/>
+            <!--otherwise autoreconf -i -f fails due to `configure.ac:33: error: Please use exactly Autoconf 2.64 instead of 2.69.`-->
+            <!--<dep package="gmp-5.1"/>-->
+            <!-- avoid `configure: error: cannot find output from flex; giving up` when using version retrieved by contrib/download_prerequisites<ref>http://stackoverflow.com/questions/23128949/compiling-gcc-cannot-find-output-from-flex-giving-up</ref> (still need to remove `gmp` because `gmp` from `/usr/local` isn't picked up my `make`)-->
+        </dependencies>
+    </autotools>
+    <autotools id="gcc-4.7" autogen-sh="./contrib/download_prerequisites &amp;&amp; ./configure --disable-multilib --enable-languages='c,c++'">
+        <branch module="gcc-4.7.4/gcc-4.7.4.tar.bz2" version="4.7.4" repo="gcc" hash="md5:4c696da46297de6ae77a82797d2abe28" size="82935453"></branch>
+        <dependencies>
+            <!--<dep package="gmp-5.1"/>-->
+            <!-- avoid `configure: error: cannot find output from flex; giving up` when using version retrieved by contrib/download_prerequisites<ref>http://stackoverflow.com/questions/23128949/compiling-gcc-cannot-find-output-from-flex-giving-up</ref> (still need to remove `gmp` because `gmp` from `/usr/local` isn't picked up my `make`)-->
+        </dependencies>
+    </autotools>
+    <autotools id="gcc-4.8" autogen-template="bash -c 'cd %(srcdir)s &amp;&amp; contrib/download_prerequisites' &amp;&amp; bash -c 'cd %(srcdir)s/gmp-4.3.2 &amp;&amp; patch &lt; $HOME/gcc-4.8.5-configure-in.patch' &amp;&amp; bash -c 'cd %(srcdir)s/gmp-4.3.2 &amp;&amp; patch &lt; $HOME/gcc-4.8.5-configure.patch' &amp;&amp; bash -c 'cd %(srcdir)s/gcc/doc &amp;&amp; patch &lt; $HOME/gcc-4.8.5-texi.patch' &amp;&amp; %(srcdir)s/configure --prefix %(prefix)s --disable-multilib --enable-languages='c,c++' --disable-doc --enable-bootstrap --enable-checking=no --with-build-config=bootstrap-O1 %(autogenargs)s">
+        <!-- unclear what happens to patches are necessary in order to avoid failure of `configure` with `can't find output of flex` and failure of `make` with `../.././gcc/doc/gcc.texi:208: no matching `@end tex'`-->
+        <branch module="gcc-4.8.5/gcc-4.8.5.tar.bz2" version="4.8.5" repo="gcc" hash="md5:80d2c2982a3392bb0b89673ff136e223" size="86165587"></branch>
+        <dependencies>
+            <dep package="flex-2.6.0"/>
+        </dependencies>
+    </autotools>
+    <autotools id="gcc" autogen-sh="./contrib/download_prerequisites &amp;&amp; ./configure">
+        <!--<branch repo="gcc.gnu.org" revision="master"/>-->
+        <branch module="gcc-5.3.0/gcc-5.3.0.tar.bz2" version="5.3.0" repo="gcc" hash="md5:c9616fd448f980259c31de613e575719" size="95441837"></branch>
+        <!--<dependencies><dep package="gcc-4.8"/>
+        <!- - depends on available g++ (`gcc` 4.7.4 fails due to `gmp` clutter `configure: error: cannot find output from flex; giving up`) - -></dependencies>-->
+    </autotools>
+    <autotools id="gcc-4.9" autogen-template="bash -c 'cd %(srcdir)s &amp;&amp; contrib/download_prerequisites' &amp;&amp; bash -c 'cd %(srcdir)s/gmp-4.3.2 &amp;&amp; patch &lt; $HOME/gcc-4.8.5-configure-in.patch' &amp;&amp; bash -c 'cd %(srcdir)s/gmp-4.3.2 &amp;&amp; patch &lt; $HOME/gcc-4.8.5-configure.patch' &amp;&amp; %(srcdir)s/configure --prefix %(prefix)s --disable-multilib --enable-languages='c,c++' --enable-bootstrap --with-build-config=bootstrap-O1 --disable-lto %(autogenargs)s">
+        <branch module="gcc-4.9.4/gcc-4.9.4.tar.bz2" version="4.9.4" repo="gcc" hash="md5:87c24a4090c1577ba817ec6882602491" size="90097606"></branch>
+        <dependencies></dependencies>
+    </autotools>
+    <autotools id="gcc-5.2" autogen-sh="./contrib/download_prerequisites &amp;&amp; ./configure --disable-multilib --enable-stage1-languages='c,c++' --enable-languages='c,c++'">
+        <!--<branch repo="gcc.gnu.org" revision="master"/>-->
+        <branch module="gcc-5.2.0/gcc-5.2.0.tar.bz2" version="5.2.0" repo="gcc" hash="md5:a51bcfeb3da7dd4c623e27207ed43467" size="95221552"></branch>
+        <dependencies></dependencies>
+    </autotools>
+    <autotools id="gcc-5.3" autogen-sh="./contrib/download_prerequisites &amp;&amp; ./configure --disable-multilib --enable-stage1-languages='c,c++' --enable-languages='c,c++' --enable-shared --disable-static --enable-lto">
+        <branch module="gcc-5.3.0/gcc-5.3.0.tar.bz2" version="5.3.0" repo="gcc" hash="md5:c9616fd448f980259c31de613e575719" size="95441837"></branch>
+        <dependencies></dependencies>
+    </autotools>
+    <autotools id="gcc-5.4" autogen-sh="./contrib/download_prerequisites &amp;&amp; ./configure --disable-multilib --enable-stage1-languages='c' --enable-languages='c' --enable-shared --disable-static --enable-lto">
+        <branch module="gcc-5.4.0/gcc-5.4.0.tar.bz2" version="5.4.0" repo="gcc" hash="md5:4c626ac2a83ef30dfb9260e6f59c2b30" size="95661481"></branch>
+        <dependencies></dependencies>
+    </autotools>
+    <autotools id="gcc-6.2" autogen-template="bash -c 'cd %(srcdir)s &amp;&amp; contrib/download_prerequisites' &amp;&amp; %(srcdir)s/configure --prefix %(prefix)s --disable-multilib --enable-languages='c,c++' --enable-bootstrap --with-build-config=bootstrap-O1 %(autogenargs)s">
+        <!--unclear why configure fails due to change of LDFLAGS after wiping directory-->
+        <branch module="gcc-6.2.0/gcc-6.2.0.tar.bz2" version="6.2.0" repo="gcc" hash="md5:9768625159663b300ae4de2f4745fcc4" size="99778648"></branch>
+        <dependencies>
+            <dep package="binutils-2.27"/>
+            <!--      <dep package="glibc-2.24"/>-->
+        </dependencies>
+    </autotools>
+    <autotools id="binutils-2.27">
+        <branch module="binutils/binutils-2.27.tar.bz2" version="2.27" repo="ftp.gnu.org" hash="md5:2869c9bf3e60ee97c74ac2a6bf4e9d68" size="26099568"></branch>
+        <dependencies></dependencies>
+    </autotools>
+    <!--<autotools id="glibc-2.24" autogen-sh="mkdir ../glibc-2.27-build; cd ../glibc-2.27-build><branch module="glibc/glibc-2.24.tar.xz" version="2.27" repo="ftp.gnu.org" hash="md5:97dc5517f92016f3d70d83e3162ad318" size="13554048"></branch><dependencies></dependencies></autotools>-->
+    <!--needs to be build in another directory-->
+    <autotools id="htop" autogen-sh="./autogen.sh &amp;&amp; ./configure">
+        <branch repo="github.com" module="hishamhm/htop" checkoutdir="htop" revision="master"/>
+        <dependencies>
+            <dep package="ncursesw"/>
+        </dependencies>
+    </autotools>
+    <autotools id="ncursesw" skip-autogen="true" autogen-sh="./configure --enable-widec">
+        <!-- doesn't provide autogen.sh -->
+        <branch repo="ftp.gnu.org" module="ncurses/ncurses-6.0.tar.gz" version="6.0" hash="md5:ee13d052e1ead260d7c28071f46eefb1" size="3131891"></branch>
+    </autotools>
+    <autotools id="gmp-6.1">
+        <branch repo="gmplib.org" module="gmp-6.1.0.tar.xz" version="6.1.0" hash="md5:a9868ef2556ad6a2909babcd1428f3c7" size="1950316"></branch>
+    </autotools>
+    <autotools id="gmp-5.1">
+        <branch repo="gmplib.org" module="gmp-5.1.3.tar.xz" version="5.1.3" hash="md5:e5fe367801ff067b923d1e6a126448aa" size="1818812"></branch>
+    </autotools>
+    <autotools id="autoconf-2.64">
+        <branch repo="ftp.gnu.org" module="autoconf/autoconf-2.64.tar.xz" version="2.64" hash="md5:9decdd5c672fd403ea467bb0789bc194" size="1113892"></branch>
+    </autotools>
+    <autotools id="autoconf-2.65">
+        <branch repo="ftp.gnu.org" module="autoconf/autoconf-2.65.tar.xz" version="2.65" hash="md5:dfb23a46ecb73a0abade39c053a6c5a1" size="1132092"></branch>
+    </autotools>
+    <autotools id="autoconf-2.69">
+        <branch repo="ftp.gnu.org" module="autoconf/autoconf-2.69.tar.xz" version="2.69" hash="md5:50f97f4159805e374639a73e2636f22e" size="1214744"></branch>
+    </autotools>
+    <autotools id="automake-1.14.1">
+        <branch repo="ftp.gnu.org" module="automake/automake-1.14.1.tar.xz" version="1.14.1" hash="md5:7fc29854c520f56b07aa232a0f880292" size="1488984"></branch>
+    </autotools>
+    <autotools id="automake-1.15">
+        <branch repo="ftp.gnu.org" module="automake/automake-1.15.tar.xz" version="1.15"/>
+    </autotools>
+    <autotools id="flex-2.6.0" autogen-template="bash -c 'cd %(srcdir)s &amp;&amp; ./autogen.sh' &amp;&amp; %(srcdir)s/configure --prefix %(prefix)s %(autogenargs)s">
+        <branch repo="sourceforge" module="flex/flex-2.6.0.tar.bz2" version="2.6.0" hash="md5:266270f13c48ed043d95648075084d59" size="1634276"></branch>
+        <dependencies>
+            <dep package="gettext"/>
+            <!-- requires at least gettext 0.19 -->
+            <!-- 0.19.8.1 and 0.19.8 fail due to missing
+          `/vol/fob-vol4/mi10/richtekp/sources/gettext-0.19.8.1/gnulib/lib/libxml/buf.c` -> might be resolved after purging source root, but then 0.19.8.1, 0.19.8, 0.19.7
+and 0.19.1 fail due to `gnulib/gnulib-tool: *** patch file gnulib-local/modules/fnmatch.diff didn't apply cleanly` -> try git -->
+            <dep package="texinfo-6.3"/>
+            <!-- `make` requires `texi2dvi` -->
+            <dep package="autoconf-2.69"/>
+            <!--otherwise configure fails-->
+            <dep package="automake-1.14.1"/>
+            <!--otherwise configure fails-->
+        </dependencies>
+    </autotools>
+    <autotools id="gettext-0.19.8.1" autogen-template="%(srcdir)s/configure --prefix %(prefix)s %(autogenargs)s">
+        <!--FIXME check whether omitting executing of autogen.sh
+prevent patch apply errors-->
+        <branch repo="ftp.gnu.org" module="gettext/gettext-0.19.8.1.tar.xz" version="0.19.8.1" hash="md5:df3f5690eaa30fd228537b00cb7b7590" size="7209808"></branch>
+        <dependencies>
+            <!--<dep package="libxml2-2.9.4"/>-->
+            <!--may be not necessary-->
+            <dep package="automake-1.15"/>
+        </dependencies>
+    </autotools>
+    <autotools id="gettext-0.19.8">
+        <branch repo="ftp.gnu.org" module="gettext/gettext-0.19.8.tar.xz" version="0.19.8" hash="md5:3e7ed1ac886b9b1a4e23e71113da6358" size="7137032"></branch>
+    </autotools>
+    <autotools id="gettext-0.19.7" autogen-template="bash -c 'cd %(srcdir)s &amp;&amp; ./autogen.sh' &amp;&amp; %(srcdir)s/configure --prefix %(prefix)s %(autogenargs)s">
+        <branch repo="ftp.gnu.org" module="gettext/gettext-0.19.7.tar.xz" version="0.19.7" hash="md5:f81e50556da41b44c1d59ac93474dca5" size="7187304"></branch>
+        <dependencies>
+            <dep package="m4-1.4.17"/>
+        </dependencies>
+    </autotools>
+    <autotools id="gettext-0.19.4" autogen-template="%(srcdir)s/configure --prefix %(prefix)s %(autogenargs)s">
+        <!--FIXME check whether omitting executing of autogen.sh prevent patch apply errors-->
+        <branch repo="ftp.gnu.org" module="gettext/gettext-0.19.4.tar.xz" version="0.19.4"></branch>
+        <dependencies>
+            <dep package="m4-1.4.17"/>
+        </dependencies>
+    </autotools>
+    <autotools id="gettext-0.19.1">
+        <branch repo="ftp.gnu.org" module="gettext/gettext-0.19.1.tar.xz" version="0.19.1" hash="md5:b52987f49bc99fa8b410270d47a9d52b" size="6610132"></branch>
+        <dependencies>
+            <dep package="m4-1.4.17"/>
+        </dependencies>
+    </autotools>
+    <autotools id="gettext" autogen-template="bash -c 'cd %(srcdir)s &amp;&amp; ./autogen.sh' &amp;&amp; %(srcdir)s/configure --prefix %(prefix)s %(autogenargs)s">
+        <branch repo="savannah.gnu.org" module="gettext" checkoutdir="gettext" revision="v0.19.3"/>
+        <dependencies>
+            <dep package="autoconf-2.65"/>
+            <dep package="groff"/>
+            <!-- avoid `groff: can't find `DESC' file
+groff:fatal error: invalid device `html' (try installing the `groff' package?)` -->
+        </dependencies>
+    </autotools>
+    <autotools id="libxml2-2.9.4" makeargs="CFLAGS=-fPIC">
+        <branch repo="xmlsoft.org" module="libxml2-2.9.4.tar.gz" version="2.9.4" hash="md5:ae249165c173b1ff386ee8ad676815f5" size="5374830"></branch>
+        <dependencies>
+            <!--<dep package="python-2.7.9"/>-->
+            <!-- fails with ~`recompile with -fPIC` otherwise -->
+            <!-- 1. python 2.7.10 fails due to `TypeError: argument of type 'NoneType' is not iterable`
+          2. is likely to fail with the same error as python-2.7.12  -->
+        </dependencies>
+    </autotools>
+    <autotools id="python-2.7.10">
+        <branch repo="python.org" module="2.7.10/Python-2.7.10.tgz" version="2.7.10" hash="md5:d7547558fd673bd9d38e2108c6b42521" size="16768806"></branch>
+    </autotools>
+    <autotools id="python-2.7.12">
+        <branch repo="python.org" module="2.7.12/Python-2.7.12.tar.xz" version="2.7.12" hash="md5:57dffcee9cee8bb2ab5f82af1d8e9a69" size="12390820"></branch>
+    </autotools>
+    <autotools id="python-2.7.9" autogenargs="CFLAGS=-fPIC CXXFLAGS=-fPIC" makeargs="CFLAGS=-fPIC CXXFLAGS=-fPIC">
+        <branch repo="python.org" module="2.7.9/Python-2.7.9.tgz" version="2.7.9" hash="md5:5eebcaa0030dc4061156d3429657fb83" size="16657930"></branch>
+    </autotools>
+    <autotools id="m4-1.4.17">
+        <branch repo="ftp.gnu.org" module="m4/m4-1.4.17.tar.xz" version="1.4.17" hash="md5:12a3c829301a4fd6586a57d3fcf196dc" size="1149088"></branch>
+    </autotools>
+    <autotools id="texinfo-6.3">
+        <branch repo="ftp.gnu.org" module="texinfo/texinfo-6.3.tar.xz" version="6.3" hash="md5:32baefe5c7080dfb512a4eac5ce67b2a" size="4468048"></branch>
+    </autotools>
+    <autotools id="gtk+">
+        <branch revision="master"/>
+        <dependencies>
+            <dep package="gobject-introspection"/>
+        </dependencies>
+    </autotools>
+    <autotools id="gobject-introspection">
+        <!--1.50.0 requires 2.50-->
+        <branch repo="github.com" module="GNOME/gobject-introspection" revision="master"/>
+        <dependencies>
+            <dep package="glib-2.50"/>
+        </dependencies>
+    </autotools>
+    <autotools id="glib">
+        <branch repo="github.com" module="GNOME/glib" revision="master"/>
+        <dependencies>
+            <dep package="util-linux"/>
+            <!--provides libmount-->
+        </dependencies>
+    </autotools>
+    <autotools id="glib-2.50">
+        <branch repo="gnome.org" module="glib/2.50/glib-2.50.0.tar.xz" version="2.50"/>
+    </autotools>
+    <!--<autotools id="libmount"><branch repo="github.com" module="tailhook/libmount" revision="master"/></autotools>-->
+    <autotools id="util-linux" autogen-template="bash -c 'cd %(srcdir)s &amp;&amp; ./autogen.sh' &amp;&amp; %(srcdir)s/configure --prefix %(prefix)s --disable-makeinstall-chown --disable-makeinstall-setuid %(autogenargs)s">
+        <branch repo="git.kernel.org" module="pub/scm/utils/util-linux/util-linux.git" revision="master"/>
+    </autotools>
+    <autotools id="groff" autogen-template="bash -c 'cd %(srcdir)s &amp;&amp; ./bootstrap' &amp;&amp; %(srcdir)s/configure --prefix %(prefix)s %(autogenargs)s">
+        <branch repo="savannah.gnu.org" module="groff.git" revision="master"/>
+    </autotools>
+</moduleset>

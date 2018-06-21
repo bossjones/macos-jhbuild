@@ -37,7 +37,7 @@ echo "Installing jhbuild..."
 
 echo "Installing jhbuild configuration..."
 mkdir -p ~/.config
-/bin/ln -sfh `pwd`/jhbuildrc ~/.config/jhbuildrc
+/bin/ln -sfh `pwd`/jhbuildrc.osx ~/.config/jhbuildrc
 if [ ! -f ~/.jhbuildrc-custom ]; then
     cp jhbuildrc-custom-example ~/.jhbuildrc-custom
 fi

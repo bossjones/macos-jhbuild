@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!--*- mode: nxml; indent-tabs-mode: nil -*-->
+<!DOCTYPE moduleset SYSTEM "moduleset.dtd">
+<?xml-stylesheet type="text/xsl" href="moduleset.xsl"?>
+<!-- vim:set ts=2 expandtab: -->
+<moduleset>
+    <!-- git repos -->
+    <repository type="git" name="git.gnome.org" default="yes" href="git://git.gnome.org/"/>
+    <repository type="git" name="git.freedesktop.org" href="git://anongit.freedesktop.org/git/"/>
+    <repository type="git" name="github.com" href="git://github.com/"/>
+    <repository type="git" name="wayland" href="git://anongit.freedesktop.org/git/wayland"/>
+    <repository type="git" name="gcc.gnu.org" href="git://gcc.gnu.org/git"/>
+    <repository type="git" name="savannah.gnu.org" href="git://git.savannah.gnu.org"/>
+    <repository type="git" name="git.kernel.org" href="git://git.kernel.org"/>
+    <!-- tarball repos (need to terminate with `/` and must not contain anchors -->
+    <repository type="tarball" name="gnome.org" href="https://download.gnome.org/sources/"/>
+    <!--<repository type="tarball" name="ftp.gnu.org" href="http://ftp.gnu.org/gnu/gcc/"/>-->
+    <!-- add `/gcc/` in order to allow replacement with other mirrors (GNU servers are sometimes down)-->
+    <repository type="tarball" name="gcc" href="ftp://ftp.gwdg.de/pub/misc/gcc/releases/"/>
+    <repository type="tarball" name="ftp.gnu.org" href="http://ftp.gnu.org/gnu/"/>
+    <repository type="tarball" name="qqwing" href="http://ostermiller.org/qqwing/"/>
+    <repository type="tarball" name="tarball.github.com" href="https://github.com/"/>
+    <repository type="tarball" name="downloads.sourceforge.net" href="http://downloads.sourceforge.net/"/>
+    <repository type="tarball" name="freedesktop.org" href="http://freedesktop.org/software/"/>
+    <repository type="git" name="telepathy.freedesktop.org" href="git://anongit.freedesktop.org/telepathy/"/>
+    <repository type="tarball" name="gmplib.org" href="https://gmplib.org/download/gmp/"/>
+    <repository type="tarball" name="sourceforge" href="http://downloads.sourceforge.net/project/"/>
+    <repository type="tarball" name="xmlsoft.org" href="http://xmlsoft.org/sources/"/>
+    <repository type="tarball" name="python.org" href="https://www.python.org/ftp/python/"/>
+    <repository type="tarball" name="launchpad.net-tarball" href="https://launchpad.net/"/>
+    <repository type="tarball" name="pypi.python.org" href="https://pypi.python.org/packages/"/>
+    <repository type="tarball" name="www.midori-browser.org" href="http://www.midori-browser.org/"/>
+    <repository type="tarball" name="www.lua.org" href="https://www.lua.org/ftp/"/>
+    <!-- bazaar repositories -->
+    <!-- NOTE: gnome-suites-core-* and gnome-suites-core-deps-*
+       are supposed to remain self-contained. If apps have dependencies
+       that are not covered there, add them in here
+
+       Please try to keep organized alphabetically by section:
+
+       1) Dependencies
+       2) Normal apps
+       3) Games
+       4) Metamodules
+    -->
+    <!-- Dependencies and miscellaneous -->
+    <autotools id="bash" autogen-sh="configure" autogenargs="--with-installed-readline">
+        <branch repo="ftp.gnu.org" module="bash/bash-4.3.30.tar.gz" version="4.3.30"/>
+        <dependencies>
+            <dep package="readline"/>
+        </dependencies>
+    </autotools>
+</moduleset>

@@ -28,3 +28,18 @@ For `meta-gnome-extended-devel-platform`:
 - pygobject: https://bugzilla.gnome.org/show_bug.cgi?id=773803
 - libpeas: https://bugzilla.gnome.org/show_bug.cgi?id=774175
 - libsecret: https://bugzilla.gnome.org/show_bug.cgi?id=734630
+
+
+
+# jhbuild-modulesets for fast bootstrapping ( via https://github.com/krichter722/jhbuild-modulesets which pyenv example )
+## Initialization
+Steps to do:
+
+  * get `jhbuild` (tarball from https://developer.gnome.org/jhbuild/ or with `git` from https://github.com/GNOME/jhbuild)
+  * build `jhbuild` with `./autogen.sh && make && make install` and add `$HOME/.local/bin/jhbuild` to your `PATH` environment variable
+
+Now you can build with
+
+```
+jhbuild --file=$HOME/jhbuild-modulesets/.jhbuildrc --moduleset=$HOME/jhbuild-modulesets/jhbuild-modules.modules build --nodeps [module name]
+```
