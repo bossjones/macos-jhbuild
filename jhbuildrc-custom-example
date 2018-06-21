@@ -1,5 +1,7 @@
 # -*- mode: python -*-
 
+import os
+
 # All of jhbuild is Python, so there are all sorts of interesting
 # things you can do to customize your build with python commands. This
 # file is treated like a python __init__ file, so you can do all sorts
@@ -79,7 +81,18 @@ prefix = os.path.join(_root, 'gnome')
 #
 # For default operation, set the architecture and SDK for the native machine:
 
-setup_sdk()
+skip.append("libiconv")
+
+setup_sdk(target='10.10')
+
+os.environ["GTLS_SYSTEM_CA_FILE"] = os.path.join(
+    prefix, "lib/python2.7/site-packages/certifi/cacert.pem")
+
+# Make sure we use the same shell in "jhbuild shell" as during building
+if os.environ.get("CONFIG_SHELL"):
+    os.environ["SHELL"] = os.environ.get("CONFIG_SHELL")
+
+# setup_sdk()
 # Comment out the previous and uncomment this one to build for all
 # systems running Yosemite and later:
 # setup_sdk(target='10.10')
