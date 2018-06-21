@@ -15,9 +15,9 @@
 
 # Source and installation locations.
 
-_root = os.path.expanduser('~/gtk')
-checkoutroot = os.path.join(_root, 'source')
-prefix = os.path.join(_root, 'inst')
+_root = os.path.expanduser('~/')
+checkoutroot = os.path.join(_root, 'jhbuild')
+prefix = os.path.join(_root, 'gnome')
 
 # You can override tarballdir so that you need download tarballs only once for
 # multiple builds. This works just as you'd expect and can save quite
