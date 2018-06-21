@@ -34,7 +34,7 @@ else
 fi
 
 echo "Installing jhbuild..."
-cd $SOURCE/jhbuild ; ./autogen.sh >/dev/null && make >/dev/null && make install >/dev/null
+cd $SOURCE/jhbuild ; ./autogen.sh && make && make install
 
 return 0
 
